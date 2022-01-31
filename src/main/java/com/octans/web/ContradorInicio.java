@@ -108,7 +108,7 @@ public class ContradorInicio {
             usuarioService.deleteById(id);
             return new ResponseEntity<>(correctResponse, HttpStatus.OK);
         } catch (Exception e) {
-            String errorResponse = "No fue posibleeliminar el registro."; 
+            String errorResponse = "No fue posible eliminar el registro."; 
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
