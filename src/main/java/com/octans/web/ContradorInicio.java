@@ -1,8 +1,9 @@
 package com.octans.web;
 
-import com.octans.model.Usuario;
+import com.octans.dto.UsuarioDto;
 import com.octans.servicio.UsuarioService;
-import java.util.Optional;
+
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class ContradorInicio {
 
     @GetMapping("/users/{nombre}")
     public ResponseEntity<?> getUserByName(@PathVariable("nombre") String nombre) {
-        Usuario usuario = usuarioService.encontrarUsuarioPorNombre(nombre);
+        var usuario = usuarioService.encontrarUsuarioPorNombre(nombre);
         if (usuario != null) {
             if (usuario.getNombre() != null || !usuario.getNombre().isEmpty()) {
                 return new ResponseEntity<>(usuario, HttpStatus.OK);
@@ -66,11 +67,10 @@ public class ContradorInicio {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> crearUsuario(@RequestBody UsuarioDto usuarioDto) {
         try {
             String response = "Usuario Creado exitosamente";
-
-            usuarioService.guardar(usuario);
+            usuarioService.guardar(usuarioDto);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             String errorResponse = "No fue posible crear el usuario."; 
@@ -79,18 +79,19 @@ public class ContradorInicio {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody Usuario usuario) {
-        Optional<Usuario> usuarioResult = usuarioService.encontrarUsuarioPorId(id);
+    public ResponseEntity<?> updateUser(@PathVariable("id") long id, @RequestBody UsuarioDto usuarioDto) {
+    	List<UsuarioDto> usuarioResult = usuarioService.encontrarUsuarioPorId(id);
         try {
-            if (usuarioResult.isPresent()) {
-                Usuario _usuario = usuarioResult.get();
-                _usuario.setNombre(usuario.getNombre());
-                _usuario.setActivo(usuario.getActivo());
-                _usuario.setRol(usuario.getRol());
+        	if(!usuarioResult.isEmpty()) {
+        		UsuarioDto usuarioDtoVar = new UsuarioDto();
+        		usuarioDtoVar.setNombre(usuarioDto.getNombre());
+        		usuarioDtoVar.setActivo(usuarioDto.getActivo());
+        		usuarioDtoVar.setRol(usuarioDto.getRol());
 
-                usuarioService.guardar(_usuario);
+                usuarioService.guardar(usuarioDtoVar);
 
                 return new ResponseEntity<>(HttpStatus.OK);
+	            
             } else {
                 String errorResponse = "El usuario no fue encontrado."; 
                 return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

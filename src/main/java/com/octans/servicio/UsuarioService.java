@@ -1,23 +1,22 @@
 package com.octans.servicio;
 
-import com.octans.model.Usuario;
+import com.octans.dto.UsuarioDto;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Clase CRUD
  * @author Mario Segura
  */
 public interface UsuarioService {
-    public List<Usuario> listarUsuarios();
+    public List<UsuarioDto> listarUsuarios();
     
-    public void guardar(Usuario usuario);
+    public void guardar(UsuarioDto usuarioDto);
     
-    public void eliminar(Usuario usuario);
+    public void eliminar(UsuarioDto usuarioDto);
     
-    public Usuario encontrarUsuarioPorNombre(String nombre);
+    public UsuarioDto encontrarUsuarioPorNombre(String nombre);
     
-    public Optional<Usuario> encontrarUsuarioPorId(Long idUsuario);
+    public List<UsuarioDto> encontrarUsuarioPorId(Long idUsuario);
     
     public void deleteById(long id);
 }

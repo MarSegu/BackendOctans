@@ -1,9 +1,10 @@
 package com.octans.servicio;
 
 import com.octans.dao.UsuarioDao;
-import com.octans.model.Usuario;
+import com.octans.dto.UsuarioDto;
+import com.octans.mapper.UsuarioConverter;
+
 import java.util.List;
-import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,42 +18,56 @@ import org.springframework.transaction.annotation.Transactional;
 @NoArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService{
     
-    @Autowired
     private UsuarioDao usuarioDao;
+    private UsuarioConverter usuarioConverter;
+    List<UsuarioDto> usuarios;
+    UsuarioDto usuarioDto;
+    
+    @Autowired
+	public UsuarioServiceImpl(UsuarioDao usuarioDao, UsuarioConverter usuarioConverter) {
+		super();
+		this.usuarioDao = usuarioDao;
+		this.usuarioConverter = usuarioConverter;
+	}    
     
     @Override
     @Transactional(readOnly = true)
-    public List<Usuario> listarUsuarios() {
-        return (List<Usuario>) usuarioDao.findAll();
+    public List<UsuarioDto> listarUsuarios() {
+        this.usuarios = this.usuarioConverter.converterUsuarioListToUsuarioDtoList(usuarioDao.findAll());
+    	return this.usuarios;
     }
 
     @Override
     @Transactional
-    public void guardar(Usuario usuario) {
-        usuarioDao.save(usuario);
+    public void guardar(UsuarioDto usuarioDto) {
+        usuarioDao.save(this.usuarioConverter.converterUsuarioDtoToUsuario(usuarioDto));
     }
 
     @Override
     @Transactional
-    public void eliminar(Usuario usuario) {
-        usuarioDao.delete(usuario);
+    public void eliminar(UsuarioDto usuarioDto) {
+        usuarioDao.delete(this.usuarioConverter.converterUsuarioDtoToUsuario(usuarioDto));
     }
 
     @Override
     @Transactional()
-    public Usuario encontrarUsuarioPorNombre(String nombre) {
-        return usuarioDao.findByNombre(nombre);
+    public UsuarioDto encontrarUsuarioPorNombre(String nombre) {
+    	this.usuarioDto = this.usuarioConverter.converterUsuarioToUsuarioDto(usuarioDao.findByNombre(nombre));
+        return this.usuarioDto;
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Usuario> encontrarUsuarioPorId(Long idUsuario) {
-        return usuarioDao.findById(idUsuario);
+    public List<UsuarioDto> encontrarUsuarioPorId(Long idUsuario) {
+    	this.usuarios = this.usuarioConverter.converterUsuarioListToUsuarioDtoList(usuarioDao.findByIdUsuario(idUsuario));
+        return this.usuarios;
     }
 
     @Override
     public void deleteById(long id) {
         usuarioDao.deleteById(id);
-    }    
+    }
+
+
     
 }
